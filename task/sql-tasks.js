@@ -43,7 +43,16 @@ async function task_1_1(db) {
  *
  */
 async function task_1_2(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+           OrderID AS "Order Id",
+           SUM(UnitPrice*Quantity) AS "Order Total Price",
+           ROUND(SUM(Discount*Quantity)*100 / SUM(UnitPrice*Quantity), 3) AS "Total Order Discount, %"
+        FROM OrderDetails
+        GROUP BY OrderID
+        ORDER BY OrderID DESC
+    `);
+    return result[0];
 }
 
 /**
@@ -54,7 +63,14 @@ async function task_1_2(db) {
  *
  */
 async function task_1_3(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+            CustomerID AS "CustomerId",
+            CompanyName AS "CompanyName"
+        FROM Customers
+        WHERE Country = 'USA' AND Fax IS NULL
+    `);
+    return result[0];
 }
 
 /**
@@ -67,7 +83,19 @@ async function task_1_3(db) {
  *
  */
 async function task_1_4(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+            CustomerID AS "Customer Id",
+            COUNT(OrderID) AS "Total number of Orders",
+            ROUND(COUNT(OrderID) / 
+                (SELECT COUNT(OrderID) FROM Orders) * 100, 5) 
+                AS "% of all orders"
+        FROM Orders
+        GROUP BY CustomerID
+        ORDER BY \`% of all orders\` DESC, CustomerID;
+
+    `);
+    return result[0];
 }
 
 /**
@@ -78,7 +106,16 @@ async function task_1_4(db) {
  *
  */
 async function task_1_5(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+            ProductID AS "ProductId",
+            ProductName AS "ProductName",
+            QuantityPerUnit AS "QuantityPerUnit"
+        FROM Products
+        WHERE ProductName BETWEEN 'A' AND 'G'
+        ORDER BY ProductName   
+    `);
+    return result[0];
 }
 
 /**
@@ -91,7 +128,17 @@ async function task_1_5(db) {
  *
  */
 async function task_1_6(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+            Products.ProductName AS "ProductName",
+            Categories.CategoryName AS "CategoryName",
+            Suppliers.CompanyName AS "SupplierCompanyName"
+        FROM Products   
+        INNER JOIN Categories ON Products.CategoryID = Categories.CategoryID
+        INNER JOIN Suppliers ON Products.SupplierID = Suppliers.SupplierID
+        ORDER BY ProductName, SupplierCompanyName;
+    `);
+    return result[0];
 }
 
 /**
@@ -105,7 +152,16 @@ async function task_1_6(db) {
  *
  */
 async function task_1_7(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+            a.EmployeeID AS "EmployeeId",
+            CONCAT(a.FirstName, " ", a.LastName) AS "FullName",
+            IFNULL(CONCAT(b.FirstName, " ", b.LastName), "-") AS "ReportsTo"
+        FROM Employees a 
+        LEFT JOIN Employees b ON a.ReportsTo = b.EmployeeID
+        ORDER BY a.EmployeeID
+    `);
+    return result[0];
 }
 
 /**
