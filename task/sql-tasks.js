@@ -159,7 +159,7 @@ async function task_1_7(db) {
             IFNULL(CONCAT(b.FirstName, " ", b.LastName), "-") AS "ReportsTo"
         FROM Employees a 
         LEFT JOIN Employees b ON a.ReportsTo = b.EmployeeID
-        ORDER BY a.EmployeeID
+        ORDER BY a.EmployeeID;
     `);
     return result[0];
 }
@@ -173,7 +173,16 @@ async function task_1_7(db) {
  *
  */
 async function task_1_8(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+            CategoryName,
+            COUNT(Products.ProductID) as "TotalNumberOfProducts"
+        FROM Categories 
+        INNER JOIN Products ON Products.CategoryID = Categories.CategoryID  
+        GROUP BY CategoryName
+        ORDER BY CategoryName;
+    `);
+    return result[0];
 }
 
 /**
@@ -185,7 +194,14 @@ async function task_1_8(db) {
  *
  */
 async function task_1_9(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+            CustomerID,
+            ContactName
+        FROM Customers 
+        WHERE ContactName LIKE 'F__n%';  
+    `);
+    return result[0];
 }
 
 /**
@@ -196,7 +212,14 @@ async function task_1_9(db) {
  *
  */
 async function task_1_10(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+            ProductID,
+            ProductName
+        FROM Products 
+        WHERE Discontinued = 1;
+    `);
+    return result[0];
 }
 
 /**
@@ -209,7 +232,15 @@ async function task_1_10(db) {
  *
  */
 async function task_1_11(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+            ProductName,
+            UnitPrice
+        FROM Products 
+        WHERE UnitPrice BETWEEN 5 AND 15
+        ORDER BY UnitPrice, ProductName;
+    `);
+    return result[0];
 }
 
 /**
@@ -222,7 +253,16 @@ async function task_1_11(db) {
  *
  */
 async function task_1_12(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+    SELECT * FROM(
+        SELECT
+            ProductName,
+            UnitPrice
+        FROM Products 
+        ORDER BY UnitPrice DESC LIMIT 20) AS MostExpensiveProducts
+    ORDER BY UnitPrice, ProductName ;
+`);
+return result[0];
 }
 
 /**
@@ -233,7 +273,13 @@ async function task_1_12(db) {
  *
  */
 async function task_1_13(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+            COUNT(UnitsInStock) AS "TotalOfCurrentProducts",
+            SUM(Discontinued) AS "TotalOfDiscontinuedProducts"
+        FROM Products; 
+`);
+return result[0];
 }
 
 /**
@@ -244,7 +290,15 @@ async function task_1_13(db) {
  *
  */
 async function task_1_14(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+            ProductName,
+            UnitsOnOrder,
+            UnitsInStock
+        FROM Products
+        WHERE UnitsOnOrder > UnitsInStock;
+`);
+return result[0];
 }
 
 /**
@@ -255,7 +309,24 @@ async function task_1_14(db) {
  *
  */
 async function task_1_15(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+            SUM(MONTH(OrderDate) = 1) AS "January",
+            SUM(MONTH(OrderDate) = 2) AS "February",
+            SUM(MONTH(OrderDate) = 3) AS "March",
+            SUM(MONTH(OrderDate) = 4) AS "April",
+            SUM(MONTH(OrderDate) = 5) AS "May",
+            SUM(MONTH(OrderDate) = 6) AS "June",
+            SUM(MONTH(OrderDate) = 7) AS "July",
+            SUM(MONTH(OrderDate) = 8) AS "August",
+            SUM(MONTH(OrderDate) = 9) AS "September",
+            SUM(MONTH(OrderDate) = 10) AS "October",            
+            SUM(MONTH(OrderDate) = 11) AS "November",
+            SUM(MONTH(OrderDate) = 12) AS "December"
+        FROM Orders
+        WHERE YEAR(OrderDate) = 1997;
+`);
+return result[0];
 }
 
 /**
@@ -266,7 +337,15 @@ async function task_1_15(db) {
  *
  */
 async function task_1_16(db) {
-    throw new Error("Not implemented");
+    let result = await db.query(`
+        SELECT
+            OrderID,
+            CustomerID,
+            ShipCountry
+        FROM Orders
+        WHERE ShipPostalCode IS NOT NULL;
+`);
+return result[0];
 }
 
 /**
