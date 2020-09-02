@@ -254,15 +254,15 @@ async function task_1_11(db) {
  */
 async function task_1_12(db) {
     let result = await db.query(`
-    SELECT * FROM(
-        SELECT
-            ProductName,
-            UnitPrice
-        FROM Products 
-        ORDER BY UnitPrice DESC LIMIT 20) AS MostExpensiveProducts
-    ORDER BY UnitPrice, ProductName ;
-`);
-return result[0];
+        SELECT * FROM(
+            SELECT
+                ProductName,
+                UnitPrice
+            FROM Products 
+            ORDER BY UnitPrice DESC LIMIT 20) AS MostExpensiveProducts
+        ORDER BY UnitPrice, ProductName ;
+    `);
+    return result[0];
 }
 
 /**
@@ -274,12 +274,11 @@ return result[0];
  */
 async function task_1_13(db) {
     let result = await db.query(`
-        SELECT
-            COUNT(UnitsInStock) AS "TotalOfCurrentProducts",
-            SUM(Discontinued) AS "TotalOfDiscontinuedProducts"
-        FROM Products; 
-`);
-return result[0];
+        SELECT * FROM
+            (SELECT COUNT(Discontinued) as 'TotalOfCurrentProducts' FROM Products) as T,
+            (SELECT COUNT(Discontinued)  as 'TotalOfDiscontinuedProducts' FROM Products WHERE Discontinued=1) as TT;
+    `);
+    return result[0];
 }
 
 /**
@@ -297,8 +296,8 @@ async function task_1_14(db) {
             UnitsInStock
         FROM Products
         WHERE UnitsOnOrder > UnitsInStock;
-`);
-return result[0];
+    `);
+    return result[0];
 }
 
 /**
@@ -311,22 +310,22 @@ return result[0];
 async function task_1_15(db) {
     let result = await db.query(`
         SELECT
-            SUM(MONTH(OrderDate) = 1) AS "January",
-            SUM(MONTH(OrderDate) = 2) AS "February",
-            SUM(MONTH(OrderDate) = 3) AS "March",
-            SUM(MONTH(OrderDate) = 4) AS "April",
-            SUM(MONTH(OrderDate) = 5) AS "May",
-            SUM(MONTH(OrderDate) = 6) AS "June",
-            SUM(MONTH(OrderDate) = 7) AS "July",
-            SUM(MONTH(OrderDate) = 8) AS "August",
-            SUM(MONTH(OrderDate) = 9) AS "September",
-            SUM(MONTH(OrderDate) = 10) AS "October",            
-            SUM(MONTH(OrderDate) = 11) AS "November",
-            SUM(MONTH(OrderDate) = 12) AS "December"
+            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 1 AND YEAR(OrderDate) = 1997) AS "January",
+            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 2 AND YEAR(OrderDate) = 1997) AS "February",
+            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 3 AND YEAR(OrderDate) = 1997) AS "March",
+            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 4 AND YEAR(OrderDate) = 1997) AS "April",
+            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 5 AND YEAR(OrderDate) = 1997) AS "May",
+            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 6 AND YEAR(OrderDate) = 1997) AS "June",
+            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 7 AND YEAR(OrderDate) = 1997) AS "July",
+            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 8 AND YEAR(OrderDate) = 1997) AS "August",
+            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 9 AND YEAR(OrderDate) = 1997) AS "September",
+            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 10 AND YEAR(OrderDate) = 1997) AS "October",
+            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 11 AND YEAR(OrderDate) = 1997) AS "November",
+            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 12 AND YEAR(OrderDate) = 1997) AS "December"
         FROM Orders
-        WHERE YEAR(OrderDate) = 1997;
-`);
-return result[0];
+        GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12;
+    `);
+    return result[0];
 }
 
 /**
@@ -344,8 +343,8 @@ async function task_1_16(db) {
             ShipCountry
         FROM Orders
         WHERE ShipPostalCode IS NOT NULL;
-`);
-return result[0];
+    `);
+    return result[0];
 }
 
 /**
@@ -366,8 +365,8 @@ async function task_1_17(db) {
         INNER JOIN Categories ON Products.CategoryID = Categories.CategoryID
         GROUP BY CategoryName
         ORDER BY \`AvgPrice\` DESC, CategoryName;
-`);
-return result[0];
+    `);
+    return result[0];
 }
 
 /**
@@ -386,8 +385,8 @@ async function task_1_18(db) {
         FROM Orders
         WHERE YEAR(OrderDate) = 1998
         GROUP BY OrderDate;
-`);
-return result[0];
+    `);
+    return result[0];
 }
 
 /**
@@ -410,8 +409,8 @@ async function task_1_19(db) {
         GROUP BY CustomerID
         HAVING \`TotalOrdersAmount, $\` > 10000
         ORDER BY \`TotalOrdersAmount, $\` DESC, CustomerID;
-`);
-return result[0];
+    `);
+    return result[0];
 }
 
 /**
@@ -434,8 +433,8 @@ async function task_1_20(db) {
         GROUP BY Employees.EmployeeID
         ORDER BY \`Amount, $\` DESC
         LIMIT 1;
-`);
-return result[0];
+    `);
+    return result[0];
 }
 
 /**
@@ -453,8 +452,8 @@ async function task_1_21(db) {
         GROUP BY OrderID
         ORDER BY \`Maximum Purchase Amount, $\` DESC
         LIMIT 1;
-`);
-return result[0];
+    `);
+    return result[0];
 }
 
 /**
@@ -467,24 +466,25 @@ return result[0];
 async function task_1_22(db) {
     let result = await db.query(`
         SELECT DISTINCT
-            Customers.CompanyName,
-            Products.ProductName,
-            OrderDetails.UnitPrice AS "PricePerItem"
-        FROM Customers
-        INNER JOIN Orders ON Customers.CustomerID = Orders.CustomerID 
-        INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
-        INNER JOIN Products ON OrderDetails.ProductID = Products.ProductID
-        WHERE OrderDetails.UnitPrice =
-        (SELECT
-            MAX(OrderDetails.UnitPrice)
-            FROM Customers AS Customers1
-            INNER JOIN Orders ON Customers1.CustomerID = Orders.CustomerID 
+            CompanyName, 
+            ProductName, 
+            PricePerItem
+        FROM (
+            SELECT 
+                CompanyName,
+                Customers.CustomerID,
+                MAX(OrderDetails.UnitPrice) AS PricePerItem
+            FROM Customers
+            INNER JOIN Orders ON Customers.CustomerID = Orders.CustomerID
             INNER JOIN OrderDetails ON Orders.OrderID = OrderDetails.OrderID
-            WHERE Customers1.CompanyName = Customers.CompanyName
-        )
-        ORDER BY \`PricePerItem\` DESC, \`CompanyName\`, \`ProductName\`;
-`);
-return result[0];
+            GROUP BY CompanyName, CustomerID    
+        ) AS Total
+        INNER JOIN Orders ON Total.CustomerID = Orders.CustomerID
+        INNER JOIN OrderDetails ON PricePerItem = OrderDetails.UnitPrice AND Orders.OrderID = OrderDetails.OrderID
+        INNER JOIN Products ON Products.ProductID = OrderDetails.ProductID
+        ORDER BY PricePerItem DESC, CompanyName, ProductName;
+    `);
+    return result[0];
 }
 
 module.exports = {
