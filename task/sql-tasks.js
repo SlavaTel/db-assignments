@@ -310,20 +310,20 @@ async function task_1_14(db) {
 async function task_1_15(db) {
     let result = await db.query(`
         SELECT
-            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 1 AND YEAR(OrderDate) = 1997) AS "January",
-            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 2 AND YEAR(OrderDate) = 1997) AS "February",
-            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 3 AND YEAR(OrderDate) = 1997) AS "March",
-            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 4 AND YEAR(OrderDate) = 1997) AS "April",
-            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 5 AND YEAR(OrderDate) = 1997) AS "May",
-            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 6 AND YEAR(OrderDate) = 1997) AS "June",
-            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 7 AND YEAR(OrderDate) = 1997) AS "July",
-            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 8 AND YEAR(OrderDate) = 1997) AS "August",
-            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 9 AND YEAR(OrderDate) = 1997) AS "September",
-            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 10 AND YEAR(OrderDate) = 1997) AS "October",
-            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 11 AND YEAR(OrderDate) = 1997) AS "November",
-            (SELECT COUNT(*) FROM Orders WHERE MONTH(OrderDate) = 12 AND YEAR(OrderDate) = 1997) AS "December"
-        FROM Orders
-        GROUP BY 1,2,3,4,5,6,7,8,9,10,11,12;
+            COUNT( IF(MONTH(OrderDate) = 1, "NICE", NULL)) AS January,
+            COUNT( IF(MONTH(OrderDate) = 2, "NICE", NULL)) AS February,
+            COUNT( IF(MONTH(OrderDate) = 3, "NICE", NULL)) AS March,
+            COUNT( IF(MONTH(OrderDate) = 4, "NICE", NULL)) AS April,
+            COUNT( IF(MONTH(OrderDate) = 5, "NICE", NULL)) AS May,
+            COUNT( IF(MONTH(OrderDate) = 6, "NICE", NULL)) AS June,
+            COUNT( IF(MONTH(OrderDate) = 7, "NICE", NULL)) AS July,
+            COUNT( IF(MONTH(OrderDate) = 8, "NICE", NULL)) AS August,
+            COUNT( IF(MONTH(OrderDate) = 9, "NICE", NULL)) AS September,
+            COUNT( IF(MONTH(OrderDate) = 10, "NICE", NULL)) AS October,
+            COUNT( IF(MONTH(OrderDate) = 11, "NICE", NULL)) AS November,
+            COUNT( IF(MONTH(OrderDate) = 12, "NICE", NULL)) AS December
+        FROM Orders 
+            WHERE YEAR(OrderDate) = 1997;    
     `);
     return result[0];
 }
