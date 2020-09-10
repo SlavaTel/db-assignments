@@ -39,8 +39,6 @@ async function before(db) {
  *   8. That's possible to rewrite a few last steps to merge a few pipeline steps in one.
  */
 async function task_3_1(db) {
-    throw new Error("Not implemented"); //remove the line before starting the task
-
     const result = await db.collection('opportunities').aggregate([
         {
             "$match" : {
@@ -58,6 +56,24 @@ async function task_3_1(db) {
                         }
                     }
                 }
+            }
+        },
+        {
+            "$project": {
+                "contacts.datePublished": 1,
+                "contacts.shortListedVendors": 1,
+                "contacts.questions.category_id": 1, 
+                "contacts.questions.answers.primary_answer_value": 1,  
+                "contacts.questions.answers.loop_text": 1,
+                "contacts.questions.criteria_value" : 1,
+                "contacts.questions.answers.criteria_value": 1,
+                "contacts.questions.answers.primary_answer_text": 1,
+                "contacts.id": 1,
+                "contacts.questions.label" : 1,
+                "contacts.questions.raw_text" : 1,
+                "contacts.questions.id" : 1,
+                "contacts.win_vendor": 1,
+                "contacts.questions.answers.loopInstances": 1,
             }
         },
         {
