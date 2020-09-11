@@ -26,7 +26,8 @@ build/Release
 
 # Dependency directory
 node_modules
-.bson
+*.bson
+*.metadata.json
 
 
 # Optional npm cache directory

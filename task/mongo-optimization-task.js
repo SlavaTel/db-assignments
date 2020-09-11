@@ -266,20 +266,18 @@ async function task_3_1(db) {
         {
             "$lookup" : {
                 "from" : "clientCriteria",
-                "localField" : "criteria_value",
-                "foreignField" : "value",
+                "let": { "criteria": "$criteria_value"},
+                "pipeline": [
+                        {"$match":
+                            { $expr:   
+                                { $eq: [ "$value",  "$$criteria" ] }
+                            }},
+                        {"$match" : 
+                            {"versions.initiativeId": ObjectId("58af4da0b310d92314627290") }
+                        }
+                    
+                    ],
                 "as" : "criteria"
-            }
-        },
-        {
-            "$unwind" : "$criteria"
-        },
-        {
-            "$unwind" : "$criteria.versions"
-        },
-        {
-            "$match" : {
-                "criteria.versions.initiativeId" : ObjectId("58af4da0b310d92314627290")
             }
         },
         {
@@ -300,11 +298,13 @@ async function task_3_1(db) {
                         "answer_value" : "$contacts.questions.answers.primary_answer_value",
                         "selected" : "$contacts.questions.answers.loopInstances.is_selected",
                         "value" : "$criteria_value",
-                        "text" : "$criteria.label",
-                        "definition" : {
-                            "$ifNull" : [
-                                "$criteria.versions.definition",
-                                "$criteria.definition"
+                        "text" : {"$arrayElemAt": ["$criteria.label", 0]},
+                        "definition" : { 
+                            "$arrayElemAt":[
+                                {"$ifNull" : [
+                                    {"$arrayElemAt": ["$criteria.versions.definition", 0]},
+                                    {"$arrayElemAt": ["$criteria.definition", 0]}
+                                ]}, 0
                             ]
                         }
                     }
